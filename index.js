@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const port = 3000
+const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const { User } = require('./models/User');
 
@@ -9,6 +10,7 @@ const { User } = require('./models/User');
 app.use(bodyParser.urlencoded({extended: true}));
 //application/json
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 const mongoose = require('mongoose')
 mongoose.connect('mongodb+srv://jwkim:abcd1234@boilerplate.ztnb1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {
@@ -35,6 +37,35 @@ app.post('/register', (req, res) => {
 
 })
 
+app.post('/login', (req, res) => {
+  // 요청된 이메일을 데이터베이스에서 있는지 확인
+  
+  User.findOne({ email : req.body.email}, (err, user) => {
+    if (!user) {
+      return res.json({
+        loginSuccess:false,
+        message: "제공된 이메일에 해당하는 유저가 없습니다."
+      })
+    }
+    // 비밀번호가 같은지 확인
+    user.comparePassword(req.body.password, (err, isMatch)=> {
+      if(!isMatch)
+        return res.json({loginSuccess:false, message:"비밀번호가 틀렸습니다"})
+      // 비밀번호가 맞다면 토큰생성
+      user.generateToken((err, user) => {
+        if (err) return res.status(400).send(err);
+
+        // token 저장 쿠키or localstorage
+        res.cookie('x_aush', user.token)
+        .status(200)
+        .json({loginSuccess:true, userId:user._id})
+      }) // 12 token
+    })
+  })
+  
+
+  
+})
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
