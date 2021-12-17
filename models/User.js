@@ -56,7 +56,7 @@ userSchema.pre('save', function( next ) {
 userSchema.methods.comparePassword = function(plainPassword, cb) {
     //plainPassword 1234567 encrypt $2b$10$2gPcxWM1ARF5xPIDB2/G5.m9fNwyPIp44Y0hiqTmQ7vff7K.zv7tu
     bcrypt.compare(plainPassword, this.password, function(err, isMatch) {
-        if(err) return cb(err),
+        if(err) return cb(err)
         cb(null, isMatch)
     })
 }
