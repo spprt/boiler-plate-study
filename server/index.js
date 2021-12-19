@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 5000
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const { auth } = require('./middleware/auth');
@@ -13,7 +13,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const { application } = require('express');
 mongoose.connect('mongodb+srv://jwkim:abcd1234@boilerplate.ztnb1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {
     useNewUrlParser: true, useUnifiedTopology: true
 }).then(() => console.log('MongoDB Connected...'))
@@ -88,6 +89,10 @@ app.get('/api/users/logout', auth, (req, res) => {
     })
 })
 
+
+app.get('/api/hello', (req,res) => {
+  res.send('hello~~~');
+}) 
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
